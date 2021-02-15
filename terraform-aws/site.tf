@@ -1,6 +1,6 @@
 # Provider spcific
 provider "aws" {
-    region = "${var.aws_region}"
+    region = var.aws_region
 }
 
 # Variables for VPC module
@@ -20,7 +20,7 @@ module "ssh_sg" {
 	source = "./modules/ssh_sg"
 	name = "tendo"
 	environment = "dev"
-	vpc_id = "${module.vpc_subnets.vpc_id}"
+	vpc_id = module.vpc_subnets.vpc_id
 	source_cidr_block = "0.0.0.0/0"
 }
 
@@ -28,7 +28,7 @@ module "web_sg" {
 	source = "./modules/web_sg"
 	name = "tendo"
 	environment = "dev"
-	vpc_id = "${module.vpc_subnets.vpc_id}"
+	vpc_id = module.vpc_subnets.vpc_id
 	source_cidr_block = "0.0.0.0/0"
 }
 
@@ -36,7 +36,7 @@ module "elb_sg" {
 	source = "./modules/elb_sg"
 	name = "tendo"
 	environment = "dev"
-	vpc_id = "${module.vpc_subnets.vpc_id}"
+	vpc_id = module.vpc_subnets.vpc_id
 }
 
 module "rds_sg" {

@@ -1,10 +1,10 @@
 resource "aws_security_group" "ssh_sg" {
     name = "${var.name}-${var.environment}-ssh"
     description = "Security Group ${var.name}-${var.environment}"
-    vpc_id = "${var.vpc_id}"
+    vpc_id = var.vpc_id
     tags {
       Name = "${var.name}-${var.environment}-ssh"
-      environment =  "${var.environment}"
+      environment =  var.environment
     }
     // allows traffic from the SG itself
     ingress {
@@ -19,7 +19,7 @@ resource "aws_security_group" "ssh_sg" {
         from_port = 22
         to_port = 22
         protocol = "tcp"
-        cidr_blocks = ["${var.source_cidr_block}"]
+        cidr_blocks = [var.source_cidr_block]
     }
 
     egress {
@@ -31,5 +31,5 @@ resource "aws_security_group" "ssh_sg" {
 }
 
 output "ssh_sg_id" {
-  value = "${aws_security_group.ssh_sg.id}"
+  value = aws_security_group.ssh_sg.id
 }

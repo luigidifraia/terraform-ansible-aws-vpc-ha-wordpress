@@ -1,10 +1,10 @@
 resource "aws_elb" "elb" {
     name = "${var.name}-${var.environment}-elb"
-    security_groups = ["${var.security_groups}"]
-    subnets = ["${split(",", var.subnets)}"]
+    security_groups = [var.security_groups]
+    subnets = [split(",", var.subnets)]
     tags {
       Name = "${var.name}-${var.environment}-elb"
-      environment =  "${var.environment}"
+      environment =  var.environment
     }
     
     listener {
@@ -27,7 +27,7 @@ resource "aws_elb" "elb" {
     connection_draining = true
     connection_draining_timeout = 400 
     
-    instances = ["${split(",", var.instance_id)}"]
+    instances = [split(",", var.instance_id)]
 
     provisioner "local-exec" {
     command = "echo ELB_DNS_NAME: ${aws_elb.elb.dns_name} >> ${var.name}-${var.environment}.yml"
@@ -35,9 +35,9 @@ resource "aws_elb" "elb" {
 }
 
 output "elb_dns_name" {
-  value = "${aws_elb.elb.dns_name}"
+  value = aws_elb.elb.dns_name
 }
 
 output "elb_zone_id" {
-  value = "${aws_elb.elb.zone_id}"
+  value = aws_elb.elb.zone_id
 }

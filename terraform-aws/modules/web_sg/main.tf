@@ -1,10 +1,10 @@
 resource "aws_security_group" "web_sg" {
     name = "${var.name}-${var.environment}-web"
     description = "Security Group ${var.name}-${var.environment}"
-    vpc_id = "${var.vpc_id}"
+    vpc_id = var.vpc_id
     tags {
       Name = "${var.name}-${var.environment}-web"
-      environment =  "${var.environment}"
+      environment =  var.environment
     }
     // allows traffic from the SG itself
     ingress {
@@ -19,7 +19,7 @@ resource "aws_security_group" "web_sg" {
         from_port = 80
         to_port = 80
         protocol = "tcp"
-        cidr_blocks = ["${var.source_cidr_block}"]
+        cidr_blocks = [var.source_cidr_block]
     }
 
     // allow traffic for TCP 443
@@ -27,7 +27,7 @@ resource "aws_security_group" "web_sg" {
         from_port = 443
         to_port = 443
         protocol = "tcp"
-        cidr_blocks = ["${var.source_cidr_block}"]
+        cidr_blocks = [var.source_cidr_block]
     }
 
     egress {
@@ -39,5 +39,5 @@ resource "aws_security_group" "web_sg" {
 }
 
 output "web_sg_id" {
-  value = "${aws_security_group.web_sg.id}"
+  value = aws_security_group.web_sg.id
 }

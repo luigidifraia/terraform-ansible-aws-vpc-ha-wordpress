@@ -1,10 +1,10 @@
 resource "aws_security_group" "rds_sg" {
     name = "${var.name}-${var.environment}-rds"
     description = "Security Group ${var.name}-${var.environment}"
-    vpc_id = "${var.vpc_id}"
+    vpc_id = var.vpc_id
     tags {
       Name = "${var.name}-${var.environment}-rds"
-      environment =  "${var.environment}"
+      environment =  var.environment
     }
 
     // allows traffic from the SG itself
@@ -20,7 +20,7 @@ resource "aws_security_group" "rds_sg" {
         from_port = 3306
         to_port = 3306
         protocol = "tcp"
-        security_groups = ["${var.security_group_id}"]
+        security_groups = [var.security_group_id]
     }
 
     // outbound internet access
@@ -33,5 +33,5 @@ resource "aws_security_group" "rds_sg" {
 }
 
 output "rds_sg_id" {
-  value = "${aws_security_group.rds_sg.id}"
+  value = aws_security_group.rds_sg.id
 }
