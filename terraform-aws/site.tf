@@ -1,6 +1,6 @@
 # Provider spcific
 provider "aws" {
-    region = "${var.aws_region}"
+    region = var.aws_region
 }
 
 # Variables for VPC module
@@ -20,7 +20,7 @@ module "ssh_sg" {
 	source = "./modules/ssh_sg"
 	name = "tendo"
 	environment = "dev"
-	vpc_id = "${module.vpc_subnets.vpc_id}"
+	vpc_id = module.vpc_subnets.vpc_id
 	source_cidr_block = "0.0.0.0/0"
 }
 
@@ -28,7 +28,7 @@ module "web_sg" {
 	source = "./modules/web_sg"
 	name = "tendo"
 	environment = "dev"
-	vpc_id = "${module.vpc_subnets.vpc_id}"
+	vpc_id = module.vpc_subnets.vpc_id
 	source_cidr_block = "0.0.0.0/0"
 }
 
@@ -36,15 +36,15 @@ module "elb_sg" {
 	source = "./modules/elb_sg"
 	name = "tendo"
 	environment = "dev"
-	vpc_id = "${module.vpc_subnets.vpc_id}"
+	vpc_id = module.vpc_subnets.vpc_id
 }
 
 module "rds_sg" {
     source = "./modules/rds_sg"
     name = "tendo"
     environment = "dev"
-    vpc_id = "${module.vpc_subnets.vpc_id}"
-    security_group_id = "${module.web_sg.web_sg_id}"
+    vpc_id = module.vpc_subnets.vpc_id
+    security_group_id = module.web_sg.web_sg_id
 }
 
 module "ec2key" {
@@ -59,10 +59,10 @@ module "ec2" {
 	environment = "dev"
 	server_role = "web"
 	ami_id = "ami-f95ef58a"
-	key_name = "${module.ec2key.ec2key_name}"
+	key_name = module.ec2key.ec2key_name
 	count = "2"
 	security_group_id = "${module.ssh_sg.ssh_sg_id},${module.web_sg.web_sg_id}"
-	subnet_id = "${module.vpc_subnets.public_subnets_id}"
+	subnet_id = module.vpc_subnets.public_subnets_id
 	instance_type = "t2.nano"
 	user_data = "#!/bin/bash\napt-get -y update\napt-get -y install nginx\n"
 }
@@ -75,26 +75,25 @@ module "rds" {
 	engine_version = "5.6.27"
 	db_name = "wordpress"
 	username = "root"
-	password = "${var.rds_password}"
-	security_group_id = "${module.rds_sg.rds_sg_id}"
-	subnet_ids = "${module.vpc_subnets.private_subnets_id}"
+	password = var.rds_password
+	security_group_id = module.rds_sg.rds_sg_id
+	subnet_ids = module.vpc_subnets.private_subnets_id
 }
 
 module "elb" {
 	source = "./modules/elb"
 	name = "tendo"
 	environment = "dev"
-	security_groups = "${module.elb_sg.elb_sg_id}"
+	security_groups = module.elb_sg.elb_sg_id
 	availability_zones = "eu-west-1a,eu-west-1b"
-	subnets = "${module.vpc_subnets.public_subnets_id}"
-	instance_id = "${module.ec2.ec2_id}"
+	subnets = module.vpc_subnets.public_subnets_id
+	instance_id = module.ec2.ec2_id
 }
 
 module "route53" {
 	source = "./modules/route53"
-	hosted_zone_id = "${var.hosted_zone_id}"
-	domain_name = "${var.domain_name}"
-	elb_address = "${module.elb.elb_dns_name}"
-	elb_zone_id = "${module.elb.elb_zone_id}"
-
+	hosted_zone_id = var.hosted_zone_id
+	domain_name = var.domain_name
+	elb_address = module.elb.elb_dns_name
+	elb_zone_id = module.elb.elb_zone_id
 }
